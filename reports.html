@@ -168,14 +168,6 @@
         cursor: pointer;
         padding: 5px;
       }
-      .edit-btn {
-        color: orange;
-        font-size: 18px;
-      }
-      .delete-btn {
-        color: red;
-        font-size: 18px;
-      }
       .view-btn {
         color: blue;
         font-size: 18px;
@@ -222,165 +214,185 @@
         cursor: default;
       }
       .modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: none; justify-content: center; align-items: center;
-  z-index: 20;
-}
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 20;
+      }
 
-.modal-content {
-  background: linear-gradient(135deg, #ffffff, #ffeaea); /* โทน Reports */
-  padding: 30px 20px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 480px;
-  box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  animation: fadeInModal 0.3s ease-out;
-}
+      .modal-content {
+        background: linear-gradient(135deg, #ffffff, #ffeaea); /* โทน Reports */
+        padding: 30px 20px;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 480px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        animation: fadeInModal 0.3s ease-out;
+      }
 
-.modal-input, .modal-content select {
-  width: 100%;
-  padding: 14px 16px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #f9f9f9;
-  transition: all 0.3s;
-  margin-bottom: 10px;
-}
+      .modal-input,
+      .modal-content select {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #f9f9f9;
+        transition: all 0.3s;
+        margin-bottom: 10px;
+      }
 
-.modal-input:focus, .modal-content select:focus {
-  border-color: #ec2c2c; /* ใช้แดง Reports */
-  background: #ffffff;
-  outline: none;
-}
+      .modal-input:focus,
+      .modal-content select:focus {
+        border-color: #ec2c2c; /* ใช้แดง Reports */
+        background: #ffffff;
+        outline: none;
+      }
 
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
+      .modal-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+      }
 
-.modal-buttons button {
-  flex: 1;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-}
+      .modal-buttons button {
+        flex: 1;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+      }
 
-.save-modal {
-  background: #2ecc71;
-  color: white;
-}
-.save-modal:hover {
-  background: #27ae60;
-  transform: translateY(-2px);
-}
+      .save-modal {
+        background: #2ecc71;
+        color: white;
+      }
+      .save-modal:hover {
+        background: #27ae60;
+        transform: translateY(-2px);
+      }
 
-.cancel-modal {
-  background: #e74c3c;
-  color: white;
-}
-.cancel-modal:hover {
-  background: #c0392b;
-  transform: translateY(-2px);
-}
-/* เพิ่มใน <style> เดิมได้เลย */
+      .cancel-modal {
+        background: #e74c3c;
+        color: white;
+      }
+      .cancel-modal:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+      }
+      /* เพิ่มใน <style> เดิมได้เลย */
 
-  @media screen and (max-width: 768px) {
-  /* === Sidebar ปรับเป็นซ่อนอัตโนมัติ === */
-  .sidebar {
-    width: 0;
-    overflow: hidden;
-  }
+      @media screen and (max-width: 768px) {
+        /* === Sidebar ปรับเป็นซ่อนอัตโนมัติ === */
+        .sidebar {
+          width: 0;
+          overflow: hidden;
+        }
 
-  .sidebar.collapsed {
-    width: 0;
-  }
+        .sidebar.collapsed {
+          width: 0;
+        }
 
-  /* === Main ขยายเต็มหน้าจอ === */
-  .main {
-    margin-left: 0;
-    padding: 10px;
-  }
+        /* === Main ขยายเต็มหน้าจอ === */
+        .main {
+          margin-left: 0;
+          padding: 10px;
+        }
 
-  .main.collapsed {
-    margin-left: 0;
-  }
+        .main.collapsed {
+          margin-left: 0;
+        }
 
-  /* === Header ขนาดเล็กลงนิดหน่อย === */
-  .header {
-    font-size: 20px;
-    padding: 0 10px;
-  }
+        /* === Header ขนาดเล็กลงนิดหน่อย === */
+        .header {
+          font-size: 20px;
+          padding: 0 10px;
+        }
 
-  /* === ปุ่ม Manual / Scan Button ย่อขนาด === */
-  .btn-top {
-    font-size: 16px;
-    padding: 8px 16px;
-  }
+        /* === ปุ่ม Manual / Scan Button ย่อขนาด === */
+        .btn-top {
+          font-size: 16px;
+          padding: 8px 16px;
+        }
 
-  button {
-    font-size: 14px;
-  }
+        button {
+          font-size: 14px;
+        }
 
-  /* === ฟอร์ม (Manual/Scan) ขยายเต็มจอเล็ก === */
-  form#manualForm, form#scanForm {
-    max-width: 100%;
-    padding: 10px;
-  }
+        /* === ฟอร์ม (Manual/Scan) ขยายเต็มจอเล็ก === */
+        form#manualForm,
+        form#scanForm {
+          max-width: 100%;
+          padding: 10px;
+        }
 
-  .form-input, select {
-    font-size: 13px;
-    padding: 10px;
-  }
+        .form-input,
+        select {
+          font-size: 13px;
+          padding: 10px;
+        }
 
-  /* === ปุ่ม Clear / Export ย่อให้เล็กลงด้วย === */
-  .clear-btn, .export-btn {
-    width: 140px;
-    padding: 8px 12px;
-    font-size: 13px;
-  }
+        /* === ปุ่ม Clear / Export ย่อให้เล็กลงด้วย === */
+        .clear-btn,
+        .export-btn {
+          width: 140px;
+          padding: 8px 12px;
+          font-size: 13px;
+        }
 
-  /* === Search Input เล็กลง === */
-  #searchInput {
-    width: 100%;
-    max-width: 100%;
-    margin-top: 10px;
-  }
+        /* === Search Input เล็กลง === */
+        #searchInput {
+          width: 100%;
+          max-width: 100%;
+          margin-top: 10px;
+        }
 
-  /* === ตารางเลื่อนได้แนวนอน === */
-  table {
-    min-width: 700px; /* เล็กลงนิดหน่อยให้พอดี Scroll มือถือ */
-  }
+        /* === ตารางเลื่อนได้แนวนอน === */
+        table {
+          min-width: 700px; /* เล็กลงนิดหน่อยให้พอดี Scroll มือถือ */
+        }
 
-  /* === Toast Notification (แจ้งเตือน) ขนาดเล็กลง === */
-  #toast {
-    font-size: 14px;
-    padding: 10px 14px;
-  }
+        /* === Toast Notification (แจ้งเตือน) ขนาดเล็กลง === */
+        #toast {
+          font-size: 14px;
+          padding: 10px 14px;
+        }
 
-  /* === Modal Popup ย่อขนาด === */
-  .modal-content {
-    width: 95%;
-    padding: 15px;
-  }
-}
+        /* === Modal Popup ย่อขนาด === */
+        .modal-content {
+          width: 95%;
+          padding: 15px;
+        }
+      }
 
+      /* Animation Fade */
+      @keyframes fadeInModal {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-/* Animation Fade */
-@keyframes fadeInModal {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+      }
     </style>
   </head>
   <body>
@@ -432,25 +444,26 @@
           </div>
         </div>
 
-        <table id="inventoryTable">
-          <thead>
-            <tr>
-              <th>ลำดับ</th>
-              <th>Invoice Number</th>
-              <th>รหัส PO</th>
-              <th>Name Item</th>
-              <th>Location</th>
-              <th>Package Qty</th>
-              <th>ยอดรับเข้า</th>
-              <th>ยอดจ่ายออก</th>
-              <th>คงเหลือ</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+        <div class="table-responsive">
+          <table id="inventoryTable">
+            <thead>
+              <tr>
+                <th>ลำดับ</th>
+                <th>Invoice Number</th>
+                <th>รหัส PO</th>
+                <th>Name Item</th>
+                <th>Location</th>
+                <th>Package Qty</th>
+                <th>ยอดรับเข้า</th>
+                <th>ยอดจ่ายออก</th>
+                <th>คงเหลือ</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
 
-          <tbody></tbody>
-        </table>
-
+            <tbody></tbody>
+          </table>
+        </div>
         <div class="pagination" id="pagination"></div>
 
         <div
@@ -464,92 +477,7 @@
           <canvas id="inventoryChart" height="100"></canvas>
         </div>
       </div>
-  </div>
-
-    <!-- Edit Modal -->
-<div id="editModal" class="modal">
-  <div class="modal-content" style="background: linear-gradient(135deg, #ffffff, #ffeaea);">
-    <h3 style="text-align: center; color: #e05656;">✏️ แก้ไขข้อมูลสินค้า</h3>
-
-    <input id="editInvoiceNumber" class="modal-input" type="text" placeholder="รหัส Invoice" style="width:90%;">
-    <input id="editItemName" class="modal-input" type="text" placeholder="ชื่อสินค้า" style="width:90%;">
-    <input id="editPackageQty" class="modal-input" type="number" placeholder="จำนวนแพ็ก (Package Qty)" style="width:90%;">
-    
-    <select id="editLocation" class="modal-input" style="width:97%;">
-      <option value="">เลือกคลังเก็บ</option style="width:90%;">
-      <option>Warehouse A</option>
-      <option>Warehouse B</option>
-    </select>
-    
-    <input id="editIn" class="modal-input" type="number" placeholder="ยอดรับเข้า (In)" style="width:90%;">
-    <input id="editOut" class="modal-input" type="number" placeholder="ยอดจ่ายออก (Out)" style="width:90%;">
-
-    <div class="modal-buttons">
-      <button class="save-modal" onclick="saveEdit()">💾 บันทึก</button>
-      <button class="cancel-modal" onclick="closeEditModal()">❌ ยกเลิก</button>
     </div>
-  </div>
-</div>
-
-    <!-- Modal ลบ -->
-    <div
-      id="deleteModal"
-      class="modal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      "
-    >
-      <div
-        class="container"
-        style="
-          max-width: 400px;
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-        "
-      >
-        <h3 style="text-align: center">Are you sure you want to delete this item?</h3>
-        <div style="text-align: center; margin-top: 20px">
-          <button
-            onclick="confirmDelete()"
-            style="
-              background: #e74c3c;
-              color: white;
-              padding: 10px 20px;
-              border: none;
-              border-radius: 6px;
-              font-weight: bold;
-              margin-right: 10px;
-            "
-          >
-            Yes,Delete
-          </button>
-          <button
-            onclick="closeDeleteModal()"
-            style="
-              background: #3498db;
-              color: white;
-              padding: 10px 20px;
-              border: none;
-              border-radius: 6px;
-              font-weight: bold;
-            "
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-    
 
     <!-- Modal ประวัติสินค้า -->
     <div
@@ -603,32 +531,30 @@
       let stockMap = {};
       let currentPage = 1;
       const itemsPerPage = 50;
-      let editKey = null;
-      let deleteKey = null;
 
       // Sidebar toggle
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("collapsed");
         document.getElementById("main").classList.toggle("collapsed");
-      }function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('main');
-  const isMobile = window.innerWidth <= 768;
+      }
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const main = document.getElementById("main");
+        const isMobile = window.innerWidth <= 768;
 
-  if (isMobile) {
-    // บนมือถือ กดแล้วเปิด/ปิด sidebar เต็มๆ
-    if (sidebar.style.width === '220px') {
-      sidebar.style.width = '0';
-    } else {
-      sidebar.style.width = '220px';
-    }
-  } else {
-    // จอใหญ่ ย่อ/ขยายแบบเดิม
-    sidebar.classList.toggle('collapsed');
-    main.classList.toggle('collapsed');
-  }
-}
-
+        if (isMobile) {
+          // บนมือถือ กดแล้วเปิด/ปิด sidebar เต็มๆ
+          if (sidebar.style.width === "220px") {
+            sidebar.style.width = "0";
+          } else {
+            sidebar.style.width = "220px";
+          }
+        } else {
+          // จอใหญ่ ย่อ/ขยายแบบเดิม
+          sidebar.classList.toggle("collapsed");
+          main.classList.toggle("collapsed");
+        }
+      }
 
       // Logout
       function logout() {
@@ -679,7 +605,7 @@
               location: item.storageLocation.trim(),
               in: 0,
               out: 0,
-              packageQty: 0, 
+              packageQty: 0,
               dates: [],
               poNumber: poCode,
             };
@@ -813,8 +739,7 @@
         <td><b>${addComma(remaining)}</b></td>
         <td class="action-buttons">
           <button class="view-btn" onclick="showHistory('${key}')"><i class="fas fa-search"></i></button>
-          <button class="edit-btn" onclick="openEditModal('${key}')"><i class="fas fa-pen"></i></button>
-          <button class="delete-btn" onclick="openDeleteModal('${key}')"><i class="fas fa-trash"></i></button>
+          
         </td>
       </tr>
     `;
@@ -858,126 +783,49 @@
         applyFilters();
       }
 
-      function openEditModal(key) {
-  editKey = key;
-  const item = stockMap[key];
-  document.getElementById("editInvoiceNumber").value = item.invoiceNumber || '';
-  document.getElementById("editItemName").value = item.name || '';
-  document.getElementById("editPackageQty").value = item.packageQty || '';
-  document.getElementById("editLocation").value = item.location || '';
-  document.getElementById("editIn").value = item.in || 0;
-  document.getElementById("editOut").value = item.out || 0;
-  document.getElementById("editModal").style.display = "flex";
-}
-
-function closeEditModal() {
-  document.getElementById("editModal").style.display = "none";
-}
-
-function saveEdit() {
-  const invoiceNumber = document.getElementById('editInvoiceNumber').value.trim();
-  const itemName = document.getElementById('editItemName').value.trim();
-  const packageQty = parseInt(document.getElementById('editPackageQty').value);
-  const location = document.getElementById('editLocation').value;
-  const inQty = parseInt(document.getElementById('editIn').value);
-  const outQty = parseInt(document.getElementById('editOut').value);
-  const bc = new BroadcastChannel('receiveItems_channel');
-bc.postMessage('updated');
-bc.close();
-
-  if (!itemName || !location) {
-    alert('❗ กรุณากรอกข้อมูลให้ครบ');
-    return;
-  }
-
-  if (editKey && stockMap[editKey]) {
-    stockMap[editKey].invoiceNumber = invoiceNumber;
-    stockMap[editKey].name = itemName;
-    stockMap[editKey].packageQty = packageQty;
-    stockMap[editKey].location = location;
-    stockMap[editKey].in = inQty;
-    stockMap[editKey].out = outQty;
-  }
-
-  // เพิ่มตรงนี้เพื่อ update localStorage ด้วย
-  const receiveItems = JSON.parse(localStorage.getItem("receiveItems")) || [];
-  const updatedReceiveItems = receiveItems.map(item => {
-    if (item.itemName.trim() === stockMap[editKey].name && item.storageLocation.trim() === stockMap[editKey].location) {
-      return {
-        ...item,
-        invoiceNumber: stockMap[editKey].invoiceNumber,
-        itemName: stockMap[editKey].name,
-        packageQty: stockMap[editKey].packageQty,
-        quantity: stockMap[editKey].in, // หรือจะบวกเพิ่มตาม logic ก็ได้
-      };
-    }
-    return item;
-  });
-
-  localStorage.setItem("receiveItems", JSON.stringify(updatedReceiveItems));
-
-  showToast('บันทึกสำเร็จ!');
-  closeEditModal();
-  applyFilters();
-}
-
-      // Modal Delete
-      function openDeleteModal(key) {
-        deleteKey = key;
-        document.getElementById("deleteModal").style.display = "flex";
-      }
-
-      function closeDeleteModal() {
-        document.getElementById("deleteModal").style.display = "none";
-      }
-
-      function confirmDelete() {
-        delete stockMap[deleteKey];
-        closeDeleteModal();
-        showToast("ลบข้อมูลสำเร็จ!");
-        applyFilters();
-      }
-
       // Modal ประวัติสินค้า
       function showHistory(key) {
-  const item = stockMap[key];
-  const received = JSON.parse(localStorage.getItem("receiveItems")) || [];
-  const dispatched = JSON.parse(localStorage.getItem("dispatchItems")) || [];
+        const item = stockMap[key];
+        const received = JSON.parse(localStorage.getItem("receiveItems")) || [];
+        const dispatched =
+          JSON.parse(localStorage.getItem("dispatchItems")) || [];
 
-  let history = `📥 รับเข้า:\n`;
-  received
-    .filter(
-      (r) =>
-        r.itemName.trim() === item.name &&
-        r.storageLocation.trim() === item.location
-    )
-    .forEach((r) => {
-      history += `- ${r.receiveDate} : ${r.quantity} ชิ้น (แพ็ค ${r.packageQty || 0}) (ที่ ${r.storageLocation})\n`;
-    });
+        let history = `📥 รับเข้า:\n`;
+        received
+          .filter(
+            (r) =>
+              r.itemName.trim() === item.name &&
+              r.storageLocation.trim() === item.location
+          )
+          .forEach((r) => {
+            history += `- ${r.receiveDate} : ${r.quantity} ชิ้น (แพ็ค ${
+              r.packageQty || 0
+            }) (ที่ ${r.storageLocation})\n`;
+          });
 
-  history += `\n📤 จ่ายออก:\n`;
-  dispatched
-    .filter(
-      (d) =>
-        d.itemName.trim() === item.name &&
-        d.location.trim() === item.location
-    )
-    .forEach((d) => {
-      history += `- ${d.dispatchDate} : ${d.quantity} ชิ้น (แพ็ค ${d.packageQty || 0}) (ไปที่ ${
-        d.receivingDept || "N/A"
-      })\n`;
-    });
+        history += `\n📤 จ่ายออก:\n`;
+        dispatched
+          .filter(
+            (d) =>
+              d.itemName.trim() === item.name &&
+              d.location.trim() === item.location
+          )
+          .forEach((d) => {
+            history += `- ${d.dispatchDate} : ${d.quantity} ชิ้น (แพ็ค ${
+              d.packageQty || 0
+            }) (ไปที่ ${d.receivingDept || "N/A"})\n`;
+          });
 
-  if (history === "📥 รับเข้า:\n\n📤 จ่ายออก:\n") {
-    history = "ไม่พบประวัติสำหรับสินค้านี้";
-  }
+        if (history === "📥 รับเข้า:\n\n📤 จ่ายออก:\n") {
+          history = "ไม่พบประวัติสำหรับสินค้านี้";
+        }
 
-  document.getElementById("historyContent").innerText = history;
-  document.getElementById("historyModal").style.display = "flex";
-}
-function closeHistoryModal() {
-  document.getElementById("historyModal").style.display = "none";
-}
+        document.getElementById("historyContent").innerText = history;
+        document.getElementById("historyModal").style.display = "flex";
+      }
+      function closeHistoryModal() {
+        document.getElementById("historyModal").style.display = "none";
+      }
 
       // Export Excel
       function exportToExcel() {
@@ -1061,8 +909,6 @@ function closeHistoryModal() {
       // ปิด Modal เมื่อกด ESC
       window.onkeydown = function (event) {
         if (event.key === "Escape") {
-          closeEditModal();
-          closeDeleteModal();
           closeHistoryModal();
         }
       };

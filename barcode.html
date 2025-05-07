@@ -151,6 +151,110 @@
       button:hover {
         background: #217dbb;
       }
+      @media screen and (max-width: 768px) {
+  .sidebar {
+    width: 0;
+    overflow: hidden;
+  }
+  .sidebar.collapsed {
+    width: 0;
+  }
+  .main {
+    margin-left: 0;
+    padding: 10px;
+  }
+  .main.collapsed {
+    margin-left: 0;
+  }
+  .header {
+    font-size: 20px;
+    padding: 0 10px;
+  }
+  .btn-top {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+  button {
+    font-size: 14px;
+  }
+  form#receiveForm {
+    max-width: 100%;
+    padding: 10px;
+  }
+  .form-input, select {
+    font-size: 13px;
+    padding: 10px;
+  }
+  .clear-btn, .export-btn {
+    width: 140px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  table {
+    min-width: 700px;
+  }
+  #toast {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .sidebar {
+    width: 0;
+    overflow: hidden;
+  }
+  .sidebar.collapsed {
+    width: 0;
+  }
+  .main {
+    margin-left: 0;
+    padding: 10px;
+  }
+  .main.collapsed {
+    margin-left: 0;
+  }
+  .header {
+    font-size: 20px;
+    padding: 0 10px;
+  }
+  .btn-top {
+    font-size: 16px;
+    padding: 8px 16px;
+  }
+  button {
+    font-size: 14px;
+  }
+  form#receiveForm {
+    max-width: 100%;
+    padding: 10px;
+  }
+  .form-input, select {
+    font-size: 13px;
+    padding: 10px;
+  }
+  .clear-btn, .export-btn {
+    width: 140px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  table {
+    min-width: 700px;
+  }
+  #toast {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+}
+
+
     </style>
   </head>
 
@@ -227,9 +331,22 @@
 
     <script>
       function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("collapsed");
-        document.getElementById("main").classList.toggle("collapsed");
-      }
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('main');
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    if (sidebar.style.width === '220px') {
+      sidebar.style.width = '0';
+    } else {
+      sidebar.style.width = '220px';
+    }
+  } else {
+    sidebar.classList.toggle('collapsed');
+    main.classList.toggle('collapsed');
+  }
+}
+
 
       function logout() {
         if (confirm("Are you sure you want to logout?")) {
@@ -408,10 +525,6 @@
           localStorage.removeItem("currentRunningNumber");
           showToast("รีเซ็ต Running Number เรียบร้อย!");
         }
-      }
-      function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle("collapsed");
-        document.getElementById("main").classList.toggle("collapsed");
       }
 
       function showToast(message = "ดำเนินการสำเร็จ!") {
