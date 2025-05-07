@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Reports - View History</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- โหลดไลบรารี -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f8f8f8;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .header {
+        background: #e05656;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        font-size: 24px;
+        color: white;
+        font-weight: bold;
+        font-style: italic;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+      .menu-toggle {
+        font-size: 24px;
+        margin-right: 20px;
+        cursor: pointer;
+      }
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 220px;
+        height: calc(100vh - 60px);
+        background: white;
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+        transition: width 0.3s;
+      }
+      .sidebar.collapsed {
+        width: 70px;
+      }
+      .sidebar a {
+        display: flex;
+        align-items: center;
+        padding: 14px 20px;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+      }
+      .sidebar a:hover {
+        background: #f0f0f0;
+      }
+      .sidebar a i {
+        margin-right: 10px;
+        width: 24px;
+        text-align: center;
+      }
+      .sidebar.collapsed a span {
+        display: none;
+      }
+      .logout-btn {
+        margin: 20px auto;
+        display: block;
+        background: #e05656;
+        color: white;
+        padding: 12px;
+        width: 90%;
+        border-radius: 8px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .main {
+        margin-left: 220px;
+        margin-top: 60px;
+        padding: 20px;
+        height: calc(100vh - 60px);
+        overflow-y: auto;
+        transition: margin-left 0.3s;
+      }
+      .sidebar.collapsed + .main {
+        margin-left: 70px;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 30px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #ec2c2c;
+        margin-top: 0;
+      }
+      .search-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+      }
+      .search-box input,
+      .search-box select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+      .button-group button {
+        background: #3498db;
+        color: white;
+        padding: 10px 15px;
+        font-size: 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-left: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .button-group button:hover {
+        background: #217dbb;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ccc;
+        text-align: center;
+      }
+      th {
+        background: #ec2c2c;
+        color: white;
+      }
+      .low-stock {
+        background-color: #ffeb99;
+      }
+      .chart-container {
+        margin-top: 40px;
+      }
+      .action-buttons button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+      }
+      .edit-btn {
+        color: orange;
+        font-size: 18px;
+      }
+      .delete-btn {
+        color: red;
+        font-size: 18px;
+      }
+      .view-btn {
+        color: blue;
+        font-size: 18px;
+      }
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #3498db;
+        color: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        font-weight: bold;
+        z-index: 9999;
+        display: none;
+        opacity: 1;
+      }
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .pagination button {
+        padding: 8px 14px;
+        font-size: 14px;
+        border: none;
+        background: #f0f0f0;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+      }
+      .pagination button:hover {
+        background: #e67e22;
+        color: white;
+        transform: translateY(-2px);
+      }
+      .pagination button:disabled {
+        background: #e67e22;
+        color: white;
+        font-weight: bold;
+        cursor: default;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </div>
+      SCAN
+    </div>
+
+    <div class="sidebar" id="sidebar">
+      <a href="ReceiveItems.html"
+        ><i class="fas fa-box"></i><span>Receive Items</span></a
+      >
+      <a href="dispatch.html"
+        ><i class="fas fa-truck"></i><span>Dispatch Items</span></a
+      >
+      <a href="reports.html"
+        ><i class="fas fa-chart-bar"></i><span>Reports</span></a
+      >
+      <a href="barcode.html"
+        ><i class="fas fa-barcode"></i><span>Scan Barcode</span></a
+      >
+      <a href="#"><i class="fas fa-cogs"></i><span>Inventory</span></a>
+      <a href="#"><i class="fas fa-user"></i><span>Users</span></a>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="main" id="main">
+      <div class="container">
+        <h2>📦 รายการสินค้า</h2>
+
+        <div class="search-box">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="ค้นหาชื่อสินค้า..."
+            oninput="applyFilters()"
+          />
+          <select id="locationFilter" onchange="applyFilters()">
+            <option value="">-- เลือก Location --</option>
+          </select>
+          <select id="monthFilter" onchange="applyFilters()">
+            <option value="">-- เลือกเดือน --</option>
+          </select>
+          <div class="button-group">
+            <button onclick="exportToExcel()">📄 Export Excel</button>
+            <button onclick="exportToPDF()">🖨️ Export PDF</button>
+          </div>
+        </div>
+
+        <table id="inventoryTable">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>Invoice Number</th>
+              <th>รหัส PO</th>
+              <th>Name Item</th>
+              <th>Location</th>
+              <th>Package Qty</th>
+              <th>ยอดรับเข้า</th>
+              <th>ยอดจ่ายออก</th>
+              <th>คงเหลือ</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody></tbody>
+        </table>
+
+        <div class="pagination" id="pagination"></div>
+
+        <div
+          id="noDataMsg"
+          style="text-align: center; margin-top: 20px; display: none"
+        >
+          ไม่มีข้อมูลสินค้า
+        </div>
+
+        <div class="chart-container">
+          <canvas id="inventoryChart" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+<div
+id="editModal"
+class="modal"
+style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+"
+>
+<div
+  class="container"
+  style="
+    max-width: 500px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+  "
+>
+  <h3>แก้ไขข้อมูลสินค้า</h3>
+  <input
+    type="text"
+    id="editInvoiceNumber"
+    placeholder="รหส Invoice"
+    class="form-input"
+    style="width:90%;"
+  />
+  <input
+    type="text"
+    id="editItemName"
+    placeholder="ชื่อสินค้า"
+    class="form-input"
+    style="width:90%;"
+  />
+  <input
+    type="number"
+    id="editPackageQty"
+    placeholder="Package Qty"
+    class="form-input"
+    style="width:90%;"
+  />
+  <select id="editLocation" class="modal-input" style="width: 90%;">
+    <option value="">Select Storage</option>
+    <option>Warehouse A</option>
+    <option>Warehouse B</option>
+  </select>
+  <input
+    type="number"
+    id="editIn"
+    placeholder="ยอดรับเข้า"
+    class="form-input"
+    style="width:90%;"
+  />
+  <input
+    type="number"
+    id="editOut"
+    placeholder="ยอดจ่ายออก"
+    class="form-input"
+    style="width:90%;"
+  />
+  <div class="modal-buttons">
+    <button
+      class="save-modal"
+      onclick="saveEdit()"
+      style="
+        background: #2ecc71;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+      "
+    >
+      Save
+    </button>
+    <button
+      class="cancel-modal"
+      onclick="closeModal()"
+      style="
+        background: #e74c3c;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+      "
+    >
+      Cancel
+    </button>
+  </div>
+</div>
+</div>
+
+    <!-- Modal ลบ -->
+    <div
+      id="deleteModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        class="container"
+        style="
+          max-width: 400px;
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+        "
+      >
+        <h3 style="text-align: center">ต้องการลบข้อมูลหรือไม่?</h3>
+        <div style="text-align: center; margin-top: 20px">
+          <button
+            onclick="confirmDelete()"
+            style="
+              background: #e74c3c;
+              color: white;
+              padding: 10px 20px;
+              border: none;
+              border-radius: 6px;
+              font-weight: bold;
+              margin-right: 10px;
+            "
+          >
+            ลบเลย
+          </button>
+          <button
+            onclick="closeDeleteModal()"
+            style="
+              background: #3498db;
+              color: white;
+              padding: 10px 20px;
+              border: none;
+              border-radius: 6px;
+              font-weight: bold;
+            "
+          >
+            ยกเลิก
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal ประวัติสินค้า -->
+    <div
+      id="historyModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        class="container"
+        style="
+          max-width: 500px;
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+        "
+      >
+        <h3>ประวัติสินค้า</h3>
+        <pre id="historyContent" style="white-space: pre-wrap"></pre>
+        <div style="text-align: center; margin-top: 10px">
+          <button
+            onclick="closeHistoryModal()"
+            style="
+              background: #3498db;
+              color: white;
+              padding: 8px 16px;
+              border: none;
+              border-radius: 6px;
+              font-weight: bold;
+            "
+          >
+            ปิด
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast">บันทึกข้อมูลสำเร็จ!</div>
+    <script>
+      let stockMap = {};
+      let currentPage = 1;
+      const itemsPerPage = 10;
+      let editKey = null;
+      let deleteKey = null;
+
+      // Sidebar toggle
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+        document.getElementById("main").classList.toggle("collapsed");
+      }
+
+      // Logout
+      function logout() {
+        if (confirm("Logout now?")) window.location.href = "login.html";
+      }
+
+      // Toast แจ้งเตือน
+      function showToast(message = "ดำเนินการสำเร็จ!") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.style.display = "block";
+        toast.style.opacity = "1";
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          setTimeout(() => {
+            toast.style.display = "none";
+          }, 500);
+        }, 2000);
+      }
+
+      // โหลดข้อมูล
+      function loadInventory() {
+        const received = JSON.parse(localStorage.getItem("receiveItems")) || [];
+        const dispatched =
+          JSON.parse(localStorage.getItem("dispatchItems")) || [];
+        const barcodesObj = JSON.parse(
+          localStorage.getItem("barcodeHistories")
+        );
+
+        const barcodes = barcodesObj.flatMap((data) => data.fileData);
+
+        stockMap = {};
+
+        received.forEach((item) => {
+          const key = `${item.itemName.trim()}__${item.storageLocation.trim()}`;
+          if (!stockMap[key]) {
+            let poCode = "";
+            const barcodeItem = barcodes.find(
+              (b) => b["Name Item"] == item.itemName
+            );
+            if (barcodeItem) {
+              poCode = barcodeItem.poNumber;
+            }
+
+            stockMap[key] = {
+              name: item.itemName.trim(),
+              location: item.storageLocation.trim(),
+              in: 0,
+              out: 0,
+              dates: [],
+              ...item,
+              poNumber: poCode,
+            };
+          }
+          stockMap[key].in += parseInt(item.quantity);
+          stockMap[key].dates.push(item.receiveDate);
+        });
+
+        dispatched.forEach((item) => {
+          const key = `${item.itemName.trim()}__${
+            item.location?.trim() || "-"
+          }`;
+          if (!stockMap[key]) {
+            stockMap[key] = {
+              name: item.itemName.trim(),
+              location: item.location || "-",
+              in: 0,
+              out: 0,
+              dates: [],
+            };
+          }
+          stockMap[key].out += parseInt(item.quantity);
+          stockMap[key].dates.push(item.dispatchDate);
+        });
+
+        populateFilters();
+        applyFilters();
+      }
+
+      // สร้างตัวกรอง
+      function populateFilters() {
+        const locationSet = new Set();
+        const monthSet = new Set();
+
+        Object.values(stockMap).forEach((item) => {
+          if (item.location && item.location !== "-")
+            locationSet.add(item.location);
+          item.dates.forEach((date) => {
+            if (date) {
+              const d = new Date(date);
+              const month = `${d.getFullYear()}-${String(
+                d.getMonth() + 1
+              ).padStart(2, "0")}`;
+              monthSet.add(month);
+            }
+          });
+        });
+
+        const locationFilter = document.getElementById("locationFilter");
+        const monthFilter = document.getElementById("monthFilter");
+        locationFilter.innerHTML = `<option value="">-- เลือก Location --</option>`;
+        monthFilter.innerHTML = `<option value="">-- เลือกเดือน --</option>`;
+
+        locationSet.forEach((loc) => {
+          locationFilter.innerHTML += `<option value="${loc}">${loc}</option>`;
+        });
+
+        Array.from(monthSet)
+          .sort()
+          .forEach((month) => {
+            const [year, m] = month.split("-");
+            monthFilter.innerHTML += `<option value="${month}">${m}/${year}</option>`;
+          });
+      }
+
+      // ใช้ตัวกรอง
+      function applyFilters() {
+        const search = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const selectedLocation =
+          document.getElementById("locationFilter").value;
+        const selectedMonth = document.getElementById("monthFilter").value;
+
+        const filteredKeys = Object.keys(stockMap).filter((key) => {
+          const item = stockMap[key];
+          const matchSearch = item.name.toLowerCase().includes(search);
+          const matchLocation =
+            selectedLocation === "" || item.location === selectedLocation;
+          const matchMonth =
+            selectedMonth === "" ||
+            item.dates.some((date) => date && date.startsWith(selectedMonth));
+          return matchSearch && matchLocation && matchMonth;
+        });
+
+        renderTable(filteredKeys);
+      }
+
+      // แสดงตาราง
+      function renderTable(keys) {
+        const tbody = document.querySelector("#inventoryTable tbody");
+        tbody.innerHTML = "";
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const pageItems = keys.slice(start, end);
+
+        if (pageItems.length === 0) {
+          document.getElementById("noDataMsg").style.display = "block";
+        } else {
+          document.getElementById("noDataMsg").style.display = "none";
+        }
+
+        function addComma(input) {
+          // Check if input is a valid number
+          if (isNaN(input) || typeof input !== "number") {
+            return "NaN"; // Return 'NaN' if input is not a valid number
+          }
+
+          // Format the number with commas
+          return input.toLocaleString();
+        }
+
+        pageItems.forEach((key, index) => {
+          console.log("key: ", key);
+          const item = stockMap[key];
+          console.log("item: ", item);
+          const remaining = item.in - item.out;
+          const rowClass = remaining <= 10 ? 'class="low-stock"' : "";
+          tbody.innerHTML += `
+      <tr ${rowClass}>
+        <td>${start + index + 1}</td>
+        <td>${item.invoiceNumber || "-"}</td>
+        <td>${item.poNumber || "-"}</td>
+        <td>${item.itemName || "-"}</td>
+        <td>${item.location || "-"}</td>
+        <td>${addComma(item.packageQty) || "-"}</td>
+        <td>${addComma(item.in)}</td>
+        <td>${addComma(item.out)}</td>
+        <td><b>${addComma(remaining)}</b></td>
+        <td class="action-buttons">
+          <button class="view-btn" onclick="showHistory('${key}')"><i class="fas fa-search"></i></button>
+          <button class="edit-btn" onclick="openEditModal('${key}')"><i class="fas fa-pen"></i></button>
+          <button class="delete-btn" onclick="openDeleteModal('${key}')"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+    `;
+        });
+
+        renderPagination(keys.length);
+        renderChart(keys);
+      }
+
+      // แสดง Pagination
+      function renderPagination(totalItems) {
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        if (totalPages <= 1) return;
+
+        if (currentPage > 1) {
+          pagination.innerHTML += `<button onclick="changePage(${
+            currentPage - 1
+          })">⬅️ Prev</button>`;
+        }
+
+        for (let i = 1; i <= totalPages; i++) {
+          if (i === currentPage) {
+            pagination.innerHTML += `<button disabled>${i}</button>`;
+          } else {
+            pagination.innerHTML += `<button onclick="changePage(${i})">${i}</button>`;
+          }
+        }
+
+        if (currentPage < totalPages) {
+          pagination.innerHTML += `<button onclick="changePage(${
+            currentPage + 1
+          })">Next ➡️</button>`;
+        }
+      }
+
+      function changePage(page) {
+        currentPage = page;
+        applyFilters();
+      }
+
+      // Modal Edit
+      function openEditModal(key) {
+        editKey = key;
+        const item = stockMap[key];
+        document.getElementById("editInvoiceNumber").value = item.invoiceNumber;
+        document.getElementById("editItemName").value = item.name;
+        document.getElementById("editPackageQty").value = item.packageQty;
+        document.getElementById("editLocation").value = item.location;
+        document.getElementById("editIn").value = item.in;
+        document.getElementById("editOut").value = item.out;
+        document.getElementById("editModal").style.display = "flex";
+      }
+
+      function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+      }
+
+      function saveEdit() {
+  const invoiceNumber = document.getElementById('editInvoiceNumber').value.trim();
+  const itemName = document.getElementById('editItemName').value.trim();
+  const packageQty = parseInt(document.getElementById('editPackageQty').value);
+  const quantity = parseInt(document.getElementById('editQuantity').value);
+  const storageLocation = document.getElementById('editLocation').value.trim();
+  const receiveDate = document.getElementById('editReceiveDate').value;
+  const handledBy = document.getElementById('editHandledBy').value.trim();
+  const remarks = document.getElementById('editRemarks').value.trim();
+
+  if (!itemName || isNaN(quantity) || quantity <= 0 || !storageLocation || !receiveDate || !handledBy) {
+    alert("❗ Please fill in all required fields properly.");
+    return;
+  }
+
+  items[editIndex] = { invoiceNumber, itemName, packageQty, quantity, storageLocation, receiveDate, handledBy, remarks };
+  localStorage.setItem('receiveItems', JSON.stringify(items));
+  closeModal();
+  renderTable();
+  showToast("Item updated successfully!");
+}
+function closeModal() {
+  const modal = document.getElementById('editModal');
+  modal.style.display = 'none';
+}
+
+      // Modal Delete
+      function openDeleteModal(key) {
+        deleteKey = key;
+        document.getElementById("deleteModal").style.display = "flex";
+      }
+
+      function closeDeleteModal() {
+        document.getElementById("deleteModal").style.display = "none";
+      }
+
+      function confirmDelete() {
+        delete stockMap[deleteKey];
+        closeDeleteModal();
+        showToast("ลบข้อมูลสำเร็จ!");
+        applyFilters();
+      }
+
+      // Modal ประวัติสินค้า
+      function showHistory(key) {
+        const item = stockMap[key];
+        const received = JSON.parse(localStorage.getItem("receiveItems")) || [];
+        const dispatched =
+          JSON.parse(localStorage.getItem("dispatchItems")) || [];
+
+        let history = `📥 รับเข้า:\n`;
+        received
+          .filter(
+            (r) =>
+              r.itemName.trim() === item.name &&
+              r.storageLocation.trim() === item.location
+          )
+          .forEach((r) => {
+            history += `- ${r.receiveDate} : ${r.quantity} ชิ้น (ที่ ${r.storageLocation})\n`;
+          });
+
+        history += `\n📤 จ่ายออก:\n`;
+        dispatched
+          .filter(
+            (d) =>
+              d.itemName.trim() === item.name &&
+              d.location.trim() === item.location
+          )
+          .forEach((d) => {
+            history += `- ${d.dispatchDate} : ${d.quantity} ชิ้น (ไปที่ ${
+              d.receivingDept || "N/A"
+            })\n`;
+          });
+
+        if (history === "📥 รับเข้า:\n\n📤 จ่ายออก:\n") {
+          history = "ไม่พบประวัติสำหรับสินค้านี้";
+        }
+
+        document.getElementById("historyContent").innerText = history;
+        document.getElementById("historyModal").style.display = "flex";
+      }
+
+      function closeHistoryModal() {
+        document.getElementById("historyModal").style.display = "none";
+      }
+
+      // Export Excel
+      function exportToExcel() {
+        const exportData = [];
+        document.querySelectorAll("#inventoryTable tbody tr").forEach((row) => {
+          exportData.push({
+            ลำดับ: row.cells[0].innerText,
+            "Invoice Number": row.cells[1].innerText,
+            "รหัส PO": row.cells[2].innerText,
+            "Name Item": row.cells[3].innerText,
+            Location: row.cells[4].innerText,
+            "Package Qty": row.cells[5].innerText,
+            ยอดรับเข้า: row.cells[6].innerText,
+            ยอดจ่ายออก: row.cells[7].innerText,
+            คงเหลือ: row.cells[8].innerText,
+          });
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Inventory");
+        XLSX.writeFile(workbook, "Inventory_Report.xlsx");
+        showToast("Export Excel สำเร็จ!");
+      }
+
+      // Export PDF
+      async function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        const table = document.getElementById("inventoryTable");
+
+        await html2canvas(table).then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+          pdf.addImage(imgData, "PNG", 0, 20, pdfWidth, pdfHeight);
+          pdf.save("Inventory_Report.pdf");
+          showToast("Export PDF สำเร็จ!");
+        });
+      }
+
+      // วาด Chart
+      function renderChart(keys) {
+        const ctx = document.getElementById("inventoryChart").getContext("2d");
+        if (window.inventoryChart) window.inventoryChart.destroy();
+
+        const labels = keys.map(
+          (key) => stockMap[key].name + " (" + stockMap[key].location + ")"
+        );
+        const data = keys.map((key) => stockMap[key].in - stockMap[key].out);
+
+        window.inventoryChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "ยอดคงเหลือ",
+                data: data,
+                backgroundColor: "rgba(46,204,113,0.7)",
+                borderColor: "rgba(46,204,113,1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            indexAxis: "y",
+            scales: { x: { beginAtZero: true } },
+          },
+        });
+      }
+
+      // ปิด Modal เมื่อคลิกนอก
+      window.onclick = function (event) {
+        if (event.target.classList.contains("modal")) {
+          event.target.style.display = "none";
+        }
+      };
+
+      // ปิด Modal เมื่อกด ESC
+      window.onkeydown = function (event) {
+        if (event.key === "Escape") {
+          closeEditModal();
+          closeDeleteModal();
+          closeHistoryModal();
+        }
+      };
+
+      // เริ่มทำงาน
+      window.onload = loadInventory;
+    </script>
+  </body>
+</html>
