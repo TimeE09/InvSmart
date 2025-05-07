@@ -127,6 +127,11 @@
       font-size: 13px;
     }
   }
+  input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
   </style>
 </head>
 <body>
@@ -141,13 +146,13 @@
       <div class="title">Please identify ID</div>
       <div class="subtitle">Enter the last 7 digits of your employee ID login</div>
       <div class="pin-inputs">
-        <input maxlength="1" type="tel" pattern="[0-9]*" inputmode="numeric" />
-        <input maxlength="1" type="tel" pattern="[0-9]*" inputmode="numeric" />
-        <input maxlength="1" type="tel" pattern="[0-9]*" inputmode="numeric" />
-        <input maxlength="1" type="tel" pattern="[0-9]*" inputmode="numeric" />
-        <input maxlength="1" type="tel" pattern="[0-9]*" inputmode="numeric" />
-        <input maxlength="1" type="tel" pattern="[0-9]*" inputmode="numeric" />
-        <input maxlength="1" type="tel" pattern="[0-9]*" inputmode="numeric" />
+        <input maxlength="1" type="number" onkeypress="return /[0-9]/.test(event.key);" />
+  <input maxlength="1" type="number" onkeypress="return /[0-9]/.test(event.key);" />
+  <input maxlength="1" type="number" onkeypress="return /[0-9]/.test(event.key);" />
+  <input maxlength="1" type="number" onkeypress="return /[0-9]/.test(event.key);" />
+  <input maxlength="1" type="number" onkeypress="return /[0-9]/.test(event.key);" />
+  <input maxlength="1" type="number" onkeypress="return /[0-9]/.test(event.key);" />
+  <input maxlength="1" type="number" onkeypress="return /[0-9]/.test(event.key);" />
       </div>
       <button class="login-btn">Login</button>
     </div>
