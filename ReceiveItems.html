@@ -1,28 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+  
 <head>
   <meta charset="UTF-8">
   <title>Receive Items - SCAN System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- External Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-// === Mock barcodeHistories สำหรับทดสอบ ===
-if (!localStorage.getItem('barcodeHistories')) {
-  localStorage.setItem('barcodeHistories', JSON.stringify([
-    {
-      runningStart: 1,
-      fileData: [
-        {
-          "Invoice Number": "SKJ251082-6",
-          "Qty": 3000,
-          "Package Qty": 11,
-          "Name Item": "สินค้าเทส"
-        }
-      ]
-    }
-  ]));
-}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -117,16 +104,17 @@ if (!localStorage.getItem('barcodeHistories')) {
       margin-bottom: 20px;
     }
     .btn-top {
-      display: block;
-      margin: 0 auto 20px;
-      background: #e67e22;
-      color: white;
-      padding: 10px 20px;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      font-size: 18px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: block;
+  margin: 10px auto 20px; /* เพิ่มห่าง header ให้ 80px */
+  padding: 10px 20px;
+  background: #e67e22;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     form {
       max-width: 600px;
@@ -350,55 +338,46 @@ if (!localStorage.getItem('barcodeHistories')) {
     }
     @media screen and (max-width: 768px) {
   .sidebar {
-    width: 0;
-    overflow: hidden;
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    z-index: 100; /* บังแค่พอดี */
+    background: white;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    transform: translateX(-100%); /* ปกติซ่อน */
   }
-  .sidebar.collapsed {
-    width: 0;
+  .sidebar.open {
+    transform: translateX(0); /* เปิด */
   }
+
   .main {
     margin-left: 0;
-    padding: 10px;
+    padding: 20px;
+    transition: filter 0.3s;
   }
-  .main.collapsed {
-    margin-left: 0;
-  }
-  .header {
-    font-size: 20px;
-    padding: 0 10px;
-  }
-  .btn-top {
-    font-size: 16px;
-    padding: 8px 16px;
-  }
-  button {
-    font-size: 14px;
-  }
-  form#receiveForm {
-    max-width: 100%;
-    padding: 10px;
-  }
-  .form-input, select {
-    font-size: 13px;
-    padding: 10px;
-  }
-  .clear-btn, .export-btn {
-    width: 140px;
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-  table {
-    min-width: 700px;
-  }
-  #toast {
-    font-size: 14px;
-    padding: 10px 14px;
-  }
-  .modal-content {
-    width: 95%;
-    padding: 15px;
+  .main.blur {
+    filter: blur(2px);
+    pointer-events: none;
   }
 }
+.choices {
+  width: 100%;
+  margin-top: 10px; /* เทียบกับ input อื่น */
+}
+
+.choices__inner {
+  width: 100%;
+  min-height: 45px; /* ให้สูงเท่า input ปกติ */
+  padding: 10px 12px; /* ปรับขอบให้คล้าย input */
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
   </style>
 </head>
 <body>
@@ -451,7 +430,8 @@ if (!localStorage.getItem('barcodeHistories')) {
 
   <select id="storageLocation" class="form-input" required>
     <option value="">Select Storage Location</option>
-    <option>A1A1</option>
+    <optgroup label="Zone A"></optgroup>
+<option>A1A1</option>
 <option>A1A2</option>
 <option>A1A3</option>
 <option>A1A4</option>
@@ -465,7 +445,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>A2A5</option>
 <option>A2A6</option>
 <option>A2A7</option>
-
+<optgroup label="Zone B"></optgroup>
 <option>B1A1</option>
 <option>B1A2</option>
 <option>B1A3</option>
@@ -480,7 +460,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>B2A5</option>
 <option>B2A6</option>
 <option>B2A7</option>
-
+<optgroup label="Zone C"></optgroup>
 <option>C1A1</option>
 <option>C1A2</option>
 <option>C1A3</option>
@@ -495,7 +475,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>C2A5</option>
 <option>C2A6</option>
 <option>C2A7</option>
-
+<optgroup label="Zone D"></optgroup>
 <option>D1A1</option>
 <option>D1A2</option>
 <option>D1A3</option>
@@ -510,7 +490,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>D2A5</option>
 <option>D2A6</option>
 <option>D2A7</option>
-
+<optgroup label="Zone E"></optgroup>
 <option>E1A1</option>
 <option>E1A2</option>
 <option>E1A3</option>
@@ -525,7 +505,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>E2A5</option>
 <option>E2A6</option>
 <option>E2A7</option>
-
+<optgroup label="Zone F"></optgroup>
 <option>F1A1</option>
 <option>F1A2</option>
 <option>F1A3</option>
@@ -540,7 +520,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>F2A5</option>
 <option>F2A6</option>
 <option>F2A7</option>
-
+<optgroup label="Zone G"></optgroup>
 <option>G1A1</option>
 <option>G1A2</option>
 <option>G1A3</option>
@@ -555,7 +535,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>G2A5</option>
 <option>G2A6</option>
 <option>G2A7</option>
-
+<optgroup label="Zone H"></optgroup>
 <option>H1A1</option>
 <option>H1A2</option>
 <option>H1A3</option>
@@ -570,7 +550,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>H2A5</option>
 <option>H2A6</option>
 <option>H2A7</option>
-
+<optgroup label="Zone I"></optgroup>
 <option>I1A1</option>
 <option>I1A2</option>
 <option>I1A3</option>
@@ -585,7 +565,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>I2A5</option>
 <option>I2A6</option>
 <option>I2A7</option>
-
+<optgroup label="Zone J"></optgroup>
 <option>J1A1</option>
 <option>J1A2</option>
 <option>J1A3</option>
@@ -600,7 +580,7 @@ if (!localStorage.getItem('barcodeHistories')) {
 <option>J2A5</option>
 <option>J2A6</option>
 <option>J2A7</option>
-
+<optgroup label="Zone K"></optgroup>
 <option>K1A1</option>
 <option>K1A2</option>
 <option>K1A3</option>
@@ -857,16 +837,13 @@ if (!localStorage.getItem('barcodeHistories')) {
   
   // Sidebar Toggle
   function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
+    const sidebar = document.getElementById('sidebar');
   const main = document.getElementById('main');
   const isMobile = window.innerWidth <= 768;
 
   if (isMobile) {
-    if (sidebar.style.width === '220px') {
-      sidebar.style.width = '0';
-    } else {
-      sidebar.style.width = '220px';
-    }
+    sidebar.classList.toggle('open');
+    main.classList.toggle('blur');
   } else {
     sidebar.classList.toggle('collapsed');
     main.classList.toggle('collapsed');
@@ -1375,6 +1352,14 @@ function findItemNameFromHistory(barcodeLast6, invoiceNumber, qty, packageQty) {
       e.target.value = e.target.value.replace(/[^0-9]/g, ''); // ล้างตัวอักษรที่เผลอวาง Paste มา
     });
   }
+});
+document.addEventListener('DOMContentLoaded', function() {
+  const element = document.getElementById('storageLocation');
+  const choices = new Choices(element, {
+    searchEnabled: true,
+    itemSelectText: '', // ไม่ต้องมีข้อความเพิ่มเติมเวลาเลือก
+    shouldSort: false   // เรียงตามที่เขียนไว้ ไม่เรียง A-Z อัตโนมัติ
+  });
 });
 </script>
 </body>
