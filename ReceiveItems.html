@@ -446,9 +446,8 @@ if (!localStorage.getItem('barcodeHistories')) {
 
   <input id="itemName" class="form-input" type="text" placeholder="Item Name" required>
 
-  <input id="packageQty" class="form-input" type="number" placeholder="Package Quantity" required>
-
-  <input id="quantity" class="form-input" type="number" placeholder="Quantity" required>
+  <input id="packageQty" class="form-input" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Package Quantity" required>
+<input id="quantity" class="form-input" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Quantity" required>
 
   <select id="storageLocation" class="form-input" required>
     <option value="">Select Storage Location</option>
@@ -644,8 +643,8 @@ if (!localStorage.getItem('barcodeHistories')) {
     <h3>Edit Item</h3>
     <input id="editInvoiceNumber" class="modal-input" type="text" placeholder="Invoice Number (Ex. INV001) " style="width:90%;">
     <input id="editItemName" class="modal-input" type="text" placeholder="Item Name" style="width:90%;">
-    <input id="editPackageQty" class="modal-input" type="number" placeholder="Package Qty" style="width: 90%;">
-    <input id="editQuantity" class="modal-input" type="number" placeholder="Quantity" style="width: 90%;">
+    <input id="editPackageQty" class="modal-input" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Package Qty" style="width: 90%;">
+<input id="editQuantity" class="modal-input" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Quantity" style="width: 90%;">
     <select id="editStorageLocation" class="modal-input" style="width: 97%;">
       <option value="">Select Storage</option>
       <option>A1A1</option>
@@ -1364,7 +1363,19 @@ function findItemNameFromHistory(barcodeLast6, invoiceNumber, qty, packageQty) {
   }
   return '';
 }
-
+['packageQty', 'quantity', 'editPackageQty', 'editQuantity'].forEach(id => {
+  const input = document.getElementById(id);
+  if (input) {
+    input.addEventListener('keypress', (e) => {
+      if (!/[0-9]/.test(e.key)) {
+        e.preventDefault(); // ห้ามพิมพ์ตัวอักษร
+      }
+    });
+    input.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/[^0-9]/g, ''); // ล้างตัวอักษรที่เผลอวาง Paste มา
+    });
+  }
+});
 </script>
 </body>
 </html>
