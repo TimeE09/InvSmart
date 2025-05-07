@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>History - SCAN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f0f0f0; height: 100vh; overflow: hidden; }
+    .header { background: #555; height: 60px; display: flex; align-items: center; padding: 0 20px; color: white; font-weight: bold; font-style: italic; position: fixed; width: 100%; top: 0; z-index: 10; }
+    .menu-toggle { font-size: 24px; margin-right: 20px; cursor: pointer; }
+    .sidebar { position: fixed; top: 60px; left: 0; width: 220px; height: calc(100vh - 60px); background: #fff; overflow-y: auto; transition: width 0.3s; }
+    .sidebar.collapsed { width: 70px; }
+    .sidebar a { display: flex; align-items: center; padding: 14px 20px; font-weight: bold; color: #333; text-decoration: none; }
+    .sidebar a:hover { background: #f0f0f0; }
+    .sidebar a i { margin-right: 10px; width: 24px; text-align: center; }
+    .sidebar.collapsed a span { display: none; }
+    .logout-btn { margin: 20px auto; display: block; background: #e05656; color: white; padding: 12px; width: 90%; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+    .main { margin-left: 220px; margin-top: 60px; padding: 20px; height: calc(100vh - 60px); overflow-y: auto; transition: margin-left 0.3s; }
+    .sidebar.collapsed + .main { margin-left: 70px; }
+    .container { max-width: 1200px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h2 { color: #555; margin-top: 0; }
+    #historyList { margin-top: 20px; }
+    .history-item { padding: 15px; border-bottom: 1px solid #ccc; }
+    #toast { position: fixed; bottom: 30px; right: 30px; background: #3498db; color: white; padding: 14px 20px; border-radius: 8px; font-weight: bold; display: none; opacity: 1; }
+    button { background: #3498db; color: white; padding: 10px 20px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin: 10px 5px 0 0; }
+    button:hover { background: #217dbb; }
+    .input-size { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+    .input-size input { width: 70px; padding: 5px; text-align: center; border: 1px solid #ccc; border-radius: 5px; }
+    @media print {
+      body * { visibility: hidden; }
+      .print-area, .print-area * { visibility: visible; }
+      .print-area { position: absolute; top: 0; left: 0; width: 100%; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+      .print-area img { width: auto; height: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+  <span>SCAN</span>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <a href="ReceiveItems.html"><i class="fas fa-box"></i><span>Receive Items</span></a>
+  <a href="dispatch.html"><i class="fas fa-truck"></i><span>Dispatch Items</span></a>
+  <a href="reports.html"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+  <a href="barcode.html"><i class="fas fa-barcode"></i><span>Scan Barcode</span></a>
+  <a href="history.html"><i class="fas fa-history"></i><span>History</span></a>
+  <a href="upload.html"><i class="fas fa-chart-bar"></i><span>Upload</span></a>
+  <a href="inventory.html"><i class="fas fa-cogs"></i><span>Manage Inventory</span></a>
+  <a href="users.html"><i class="fas fa-user"></i><span>User Management</span></a>
+  <button class="logout-btn" onclick="logout()">
+    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+  </button>
+</div>
+
+<div class="main">
+  <div class="container">
+    <h2>📂 History - Files Uploaded</h2>
+    <div id="historyList"></div>
+    <button onclick="clearAllHistory()" style="background:#e74c3c;">🗑️ ล้างประวัติทั้งหมด</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.querySelector('.main').classList.toggle('collapsed');
+}
+function logout() {
+  if (confirm('Are you sure you want to logout?')) {
+    window.location.href = "login.html";
+  }
+}
+function showToast(message="ดำเนินการสำเร็จ!") {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.display = 'block';
+  toast.style.opacity = '1';
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => { toast.style.display = 'none'; }, 500); }, 2000);
+}
+function loadHistoryList() {
+  const histories = JSON.parse(localStorage.getItem('barcodeHistories')) || [];
+  const historyList = document.getElementById('historyList');
+  if (!histories.length) {
+    historyList.innerHTML = "<p>ยังไม่มีประวัติการอัปโหลดไฟล์</p>";
+    return;
+  
+  // สร้าง stockMap จากไฟล์ล่าสุด เพื่อให้ reports.html ใช้งานได้
+  if (histories.length > 0) {
+    const last = histories[histories.length - 1];
+    const stockMap = {};
+    last.fileData.forEach((row, index) => {
+      const key = `${row['Name Item'] || 'NoName'}_${row['poNumberO'] || 'NoPO'}`;
+      stockMap[key] = {
+        invoiceNumber: row['Invoice Number'] || '',
+        poNumber: row['poNumber'] || '',
+        itemName: row['Name Item'] || '',
+        location: row['Location'] || '',
+        packQty: row['Package Qty'] || '',
+        in: 1,
+        out: 0
+      };
+    });
+    localStorage.setItem('stockMap', JSON.stringify(stockMap));
+  }
+}
+  historyList.innerHTML = histories.map(h => `
+    <div class="history-item">
+      📄 <b>Upload:</b> ${h.timestamp}<br>
+      🔢 <b>Barcodes:</b> ${h.barcodes.length} รายการ<br>
+      <div class="input-size">
+        <label>กว้าง</label><input type="number" id="width-${h.id}" value="2" min="1" max="10">
+        <label>สูง</label><input type="number" id="height-${h.id}" value="50" min="10" max="200">
+      </div>
+      <button onclick="viewUploadedFile(${h.id})">📂 View File</button>
+      <button onclick="exportUploadedFile(${h.id})">📥 Export Excel</button>
+      <button onclick="printHistory(${h.id})">🖨️ Print Again</button>
+      <button onclick="deleteHistory(${h.id})" style="background:#e74c3c;">🗑️ Delete</button>
+    </div>
+  `).join('');
+}
+function deleteHistory(id) {
+  if (!confirm('ลบประวัตินี้ใช่ไหม?')) return;
+  const histories = JSON.parse(localStorage.getItem('barcodeHistories')) || [];
+  const updated = histories.filter(h => h.id !== id);
+  localStorage.setItem('barcodeHistories', JSON.stringify(updated));
+  showToast('ลบประวัติสำเร็จ!');
+  loadHistoryList();
+}
+function clearAllHistory() {
+  if (confirm('คุณต้องการล้างประวัติทั้งหมดใช่ไหม?')) {
+    localStorage.removeItem('barcodeHistories');
+    localStorage.setItem('currentRunningNumber', 1);
+    showToast('ล้างประวัติทั้งหมดสำเร็จ!');
+    loadHistoryList();
+  }
+}
+function viewUploadedFile(id) {
+  const histories = JSON.parse(localStorage.getItem('barcodeHistories')) || [];
+  const history = histories.find(h => h.id === id);
+  if (!history) { alert('ไม่พบข้อมูล'); return; }
+
+  const startRunningNumber = history.runningStart || 1;
+
+  const w = window.open('', '_blank');
+  w.document.write('<html><head><title>Uploaded File Preview</title><style>body{font-family:Arial;padding:20px;}table{border-collapse:collapse;width:100%;margin-top:20px;}th,td{border:1px solid #ccc;padding:8px;text-align:left;}th{background-color:#f2f2f2;}</style></head><body>');
+  w.document.write('<h2>📂 Uploaded File Preview</h2>');
+  w.document.write('<table><thead><tr><th>Running Number</th><th>Package Qty</th><th>Invoice Number</th><th>Qty</th><th>poNumber</th><th>Name Item</th></tr></thead><tbody>');
+  history.fileData.forEach((row, index) => {
+    w.document.write('<tr>');
+    w.document.write(`<td>${String(startRunningNumber + index).padStart(6, '0')}</td>`);
+    w.document.write(`<td>${row['Package Qty'] || ''}</td>`);
+    w.document.write(`<td>${row['Invoice Number'] || ''}</td>`);
+    w.document.write(`<td>${row['Qty'] || ''}</td>`);
+    w.document.write(`<td>${row['poNumber'] || ''}</td>`);
+    w.document.write(`<td>${row['Name Item'] || ''}</td>`);
+    w.document.write('</tr>');
+  });
+  w.document.write('</tbody></table>');
+  w.document.write('</body></html>');
+  w.document.close();
+  w.focus();
+}
+function exportUploadedFile(id) {
+  const histories = JSON.parse(localStorage.getItem('barcodeHistories')) || [];
+  const history = histories.find(h => h.id === id);
+  if (!history) { alert('ไม่พบข้อมูล'); return; }
+
+  const startRunningNumber = history.runningStart || 1;
+
+  const data = history.fileData.map((row, index) => ({
+    'Running Number': String(startRunningNumber + index).padStart(6, '0'),
+    'Package Qty': row['Package Qty'] || '',
+    'Invoice Number': row['Invoice Number'] || '',
+    'Qty': row['Qty'] || '',
+    'poNumber': row['poNumber'] || '',
+    'Name Item': row['Name Item'] || ''
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "UploadedFile");
+  XLSX.writeFile(workbook, `uploaded_file_${id}.xlsx`);
+}
+function printHistory(id) {
+  const histories = JSON.parse(localStorage.getItem('barcodeHistories')) || [];
+  const history = histories.find(h => h.id === id);
+  if (!history) { alert('ไม่พบข้อมูล'); return; }
+  const width = parseInt(document.getElementById(`width-${id}`).value) || 2;
+  const height = parseInt(document.getElementById(`height-${id}`).value) || 50;
+  const w = window.open('', '_blank');
+  w.document.write('<html><head><title>Print Barcodes</title><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script><style>body{margin:20px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;}</style></head><body class="print-area">');
+  history.barcodes.forEach((barcode, idx) => {
+    const idSafe = 'barcode' + idx;
+    w.document.write(`<svg id="${idSafe}"></svg>`);
+    w.document.write(`<script>JsBarcode('#${idSafe}', '${barcode}', {format:'CODE128',width:${width},height:${height},displayValue:true});<\/script>`);
+  });
+  w.document.write('</body></html>');
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); w.close(); }, 1500);
+}
+window.onload = loadHistoryList;
+</script>
+
+</body>
+</html>
